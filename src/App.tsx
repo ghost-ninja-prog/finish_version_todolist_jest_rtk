@@ -1,13 +1,16 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import Todos from './components/Todos/Todos';
-import { useAppDispatch, useAppSelector } from './components/store/hooks';
-import { clearErrorMessage } from './components/store/slices/todoSlice';
+import TodoList from './components/TodoList/TodoList';
+import { useAppDispatch, useAppSelector } from './store/hooks';
+import { clearErrorMessage } from './store/slices/todoSlice';
+import AddTodo from './components/AddTodo/AddTodo';
 
 
 const AppContainer = styled.div`
   padding: 10px 20px;
   text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
 `
 const Title = styled.h1`
   font-size: 32px;
@@ -43,7 +46,8 @@ const App: React.FC = () => {
       <Title>
         Todo List React+RTK+Jest
       </Title>
-      <Todos />
+      <AddTodo />
+      <TodoList />
       {error &&  <DisplayMessage>
         { error }
       </DisplayMessage>

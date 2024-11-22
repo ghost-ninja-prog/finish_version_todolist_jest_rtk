@@ -1,9 +1,11 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { asyncTodoReducer } from "./slices/todoSlice";
+import { favoritesReducer } from "./slices/favoritesSlice";
 
 
 const rootReducer = combineReducers({
-    asyncTodos: asyncTodoReducer
+    asyncTodos: asyncTodoReducer,
+    favorites: favoritesReducer
 })
 
 export const store = configureStore({

@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { CheckOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { Button, Checkbox } from 'antd'
+import { CheckOutlined, DeleteOutlined, EditOutlined, StarOutlined } from '@ant-design/icons'
+import { Button, Checkbox, Flex, Tooltip } from 'antd'
 
 
-import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { TTodoType, toggleTodo, deleteTodo, editTodo } from '../store/slices/todoSlice'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { TTodoType, toggleTodo, deleteTodo, editTodo } from '../../store/slices/todoSlice'
+import { addToFavorites } from '../../store/slices/favoritesSlice'
 
 
 
 const TodoWrapper = styled.div`
   border: 1px solid rgba(0,0,0, .3);
   border-radius: 5px;
-  padding: 5px 10px;
   margin: 3px 0;
   display: flex;
   justify-content: space-between;
@@ -22,28 +22,23 @@ const TodoWrapper = styled.div`
 
 const TodoTitle = styled.h4`
   font-family: Arial, Helvetica, sans-serif;
-  letter-spacing: .1em;
   text-transform: uppercase;
-  font-size: 20px;
+  font-size: 16px;
+  font-weight: 300;
   margin: 3px 0;
   cursor: default;
 `
 const TodoInputTitle = styled.input`
   border: none;
   font-family: Arial, Helvetica, sans-serif;
-  letter-spacing: 0.1em;
   text-transform: uppercase;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 300;
   border-bottom: 1px solid #000;
+  width: 100%;
+  text-align: center;
+  margin: 0 15px;
 `
-
-const TodoBtnWrapper = styled.div`
-  display: flex;
-  column-gap: 15px;
-`
-
-
 
 
 
@@ -51,7 +46,10 @@ type TTodoProps = {
   todo: TTodoType
 }
 
-const Todo: React.FC<TTodoProps> = ({ todo }) => {
+
+
+
+const TodoItem: React.FC<TTodoProps> = ({ todo }) => {
 
   const [status, setStatus] = useState(todo.completed)
   const [titleValue, setTitleValue] = useState(todo.title)
@@ -64,7 +62,7 @@ const Todo: React.FC<TTodoProps> = ({ todo }) => {
 
   useEffect(() => {
     const updateTodo = todos.find(t => t.id === todo.id)
-    if(updateTodo) {
+    if (updateTodo) {
       setStatus(updateTodo.completed)
     }
   }, [todos])
@@ -98,13 +96,30 @@ const Todo: React.FC<TTodoProps> = ({ todo }) => {
     dispatch(deleteTodo(todo.id))
   }
 
+  const clickFavoritesHandler = () => {
+    dispatch(addToFavorites({
+      ...todo,
+      favorite: true
+    }))
+  }
+
 
   return (
     <TodoWrapper>
-      <Checkbox
-        checked={status}
-        onChange={checkboxHandler}
-      />
+
+      <Flex gap="small">
+        <Checkbox
+          checked={status}
+          onChange={checkboxHandler}
+          />
+        <Tooltip title="favorites">
+          <Button         
+            icon={ <StarOutlined /> }
+            onClick={clickFavoritesHandler}
+            />
+        </Tooltip>
+      </Flex>
+
       {isEditMode ? (
         <TodoInputTitle
           value={titleValue}
@@ -112,30 +127,40 @@ const Todo: React.FC<TTodoProps> = ({ todo }) => {
           onChange={inputHandler}
         />
       ) : (
-          <TodoTitle>
-            {todo.title}
-          </TodoTitle>
+        <TodoTitle>
+          {todo.title}
+        </TodoTitle>
       )}
-      <TodoBtnWrapper>
+
+      <Flex gap="small">
 
         {isEditMode ? (
-          <Button
-          icon={<CheckOutlined />}
-          onClick={clickSaveHandler}
-          />
+          <Tooltip title="save">
+            <Button
+              icon={<CheckOutlined />}
+              onClick={clickSaveHandler}
+            />
+          </Tooltip>
         ) : (
-          <Button
-          icon={<EditOutlined/>}
-          onClick={clickEditHandler}
-          />
+          <Tooltip title="edit">
+            <Button
+              icon={<EditOutlined />}
+              onClick={clickEditHandler}
+            />
+          </Tooltip>
         )}
-        <Button
-          icon={<DeleteOutlined />}
-          onClick={clickDeleteHandler}
-        />
-      </TodoBtnWrapper>
+
+        <Tooltip title="delete">
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={clickDeleteHandler}
+          />
+        </Tooltip>
+
+      </Flex>
+
     </TodoWrapper>
   )
 }
 
-export default Todo
+export default TodoItem

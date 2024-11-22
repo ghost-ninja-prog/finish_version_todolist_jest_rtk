@@ -8,6 +8,12 @@ export type TTodoType = {
     userId: string,
 }
 
+export type TCreatedTodo = {
+    title: string,
+    userId: string,
+    completed: boolean,
+}
+
 export type TTodosStateType = {
     todos: TTodoType[],
     loading: boolean,
@@ -26,6 +32,23 @@ export const fetchTodos = createAsyncThunk(
         
         if (!response.ok) {
             return rejectWithValue('Can\'t fetch todo. Server error!!!')
+        }
+        return response.json()
+    }
+)
+
+export const createTodo = createAsyncThunk(
+    'todos/createTodo',
+    async (todo: TCreatedTodo, { rejectWithValue }) => {
+        const response = await fetch(`${URL}`, {
+            method: 'POST',
+            body: JSON.stringify(todo),
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+            }
+        })
+        if(!response.ok) {
+            return rejectWithValue('Error created todo')
         }
         return response.json()
     }
@@ -73,7 +96,8 @@ export const editTodo = createAsyncThunk(
             }
         })
         if(!response.ok) {
-            return rejectWithValue('error server !!!!!')
+            // return rejectWithValue('error server !!!!!')
+            throw new Error('Error server!!!! (((')
         }
         return response.json()
     } 
@@ -126,6 +150,12 @@ const asyncTodoSlice = createSlice({
                 state.todos = state.todos.map(todo => todo.id === action.payload.id ? action.payload : todo)                
             })
             .addCase(editTodo.rejected, (state, action) => {
+                state.error = action.error.message
+            })
+            .addCase(createTodo.fulfilled, (state, action) => {
+                state.todos = [{...action.payload}, ...state.todos]
+            })
+            .addCase(createTodo.rejected, (state, action) => {
                 state.error = action.error.message
             })
     },
