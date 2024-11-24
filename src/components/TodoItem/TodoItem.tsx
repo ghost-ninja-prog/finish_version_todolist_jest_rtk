@@ -1,11 +1,11 @@
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useState } from 'react'
 import styled from 'styled-components'
 import { CheckOutlined, DeleteOutlined, EditOutlined, StarOutlined } from '@ant-design/icons'
 import { Button, Checkbox, Flex, Tooltip } from 'antd'
 
 
 import { useAppDispatch } from '../../store/hooks'
-import { TTodoType, changeStatus, deleteElem } from '../../store/slices/todoSlice'
+import { TEditTodoType, TTodoType, changeStatus, deleteElem, editMessage, editTodo } from '../../store/slices/todoSlice'
 import { addToFavorites } from '../../store/slices/favoritesSlice'
 
 
@@ -45,13 +45,10 @@ const TodoInputTitle = styled.input`
 
 const TodoItem: React.FC<TTodoType> = memo( function TodoItem ({ title, id, completed, userId }) {
 
-  // const [titleValue, setTitleValue] = useState(title)
-
-  // const [isEditMode, setIsEditMode] = useState(false)
+  const [titleValue, setTitleValue] = useState(title)
+  const [isEditMode, setIsEditMode] = useState(false)
 
   const dispatch = useAppDispatch()
-
-
 
 
   const checkboxHandler = () => {    
@@ -59,26 +56,30 @@ const TodoItem: React.FC<TTodoType> = memo( function TodoItem ({ title, id, comp
   }
 
 
-  // const inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setTitleValue(e.target.value)
-  // }
+  const inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitleValue(e.target.value)
+  }
 
 
-  // const clickEditHandler = () => {
-  //   setIsEditMode(true)
-  // }
+  const clickEditHandler = () => {
+    setIsEditMode(true)
+    setTitleValue(title)
+  }
 
 
-  // const clickSaveHandler = () => {
-  //   setIsEditMode(false)
-  //   const updatedTodo: TTodoType = {
-  //     id: id,
-  //     title: titleValue,
-  //     completed: status,
-  //     userId: userId
-  //   }
-  //   dispatch(editTodo(updatedTodo))
-  // }
+  const clickSaveHandler = () => {
+    setIsEditMode(false)
+    if(!titleValue.trim()) {
+      dispatch(editMessage('Введите текст задачи'))
+      return
+    }
+    const updatedTodo: TEditTodoType = {
+      id: id,
+      title: titleValue.trim(),
+    }
+    dispatch(editTodo(updatedTodo))
+    setTitleValue(title)
+  }
 
 
   const clickDeleteHandler = () => {
@@ -113,35 +114,35 @@ const TodoItem: React.FC<TTodoType> = memo( function TodoItem ({ title, id, comp
         </Tooltip>
       </Flex>
 
-      {/* {isEditMode ? (
+      {isEditMode ? (
         <TodoInputTitle
           value={titleValue}
           type='text'
           onChange={inputHandler}
         />
-      ) : ( */}
+      ) : (
         <TodoTitle>
           {title}
         </TodoTitle>
-      {/* )}  */}
+      )}  
 
       <Flex gap="small">
 
-        {/* {isEditMode ? (
+        {isEditMode ? (
           <Tooltip title="save">
             <Button
               icon={<CheckOutlined />}
               onClick={clickSaveHandler}
             />
           </Tooltip>
-        ) : ( */}
+        ) : (
           <Tooltip title="edit">
             <Button
               icon={<EditOutlined />}
-              // onClick={clickEditHandler}
+              onClick={clickEditHandler}
             />
           </Tooltip>
-        {/* )} */}
+        )}
 
         <Tooltip title="delete">
           <Button

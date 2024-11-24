@@ -11,12 +11,17 @@ export type TTodoType = {
 export type TCategoriesType = 'all' | 'completed' | 'active' | 'favorite'
 
 export type TTodosStateType = {
-    data: TTodoType[],
+    todos: TTodoType[],
     loading: boolean,
     error: string | null | undefined,
+    message: string | null,
     categories: TCategoriesType
 }
 
+export type TEditTodoType = {
+    id: number,
+    title: string,
+}
 
 
 const todos = [
@@ -56,9 +61,10 @@ const todos = [
 
 
 const initialState: TTodosStateType = {
-    data: todos,
+    todos,
     loading: false,
     error: null,
+    message: null,
     categories: 'all',
 }
 
@@ -66,24 +72,27 @@ const asyncTodoSlice = createSlice({
     name: 'todos',
     initialState,
     reducers: {
-        clearErrorMessage: (state) => {
-            state.error = null
+        editMessage: (state, action: PayloadAction<string | null>) => {
+            state.message = action.payload
         },
-        changeCategiries: (state, action: PayloadAction<TCategoriesType>) => {
+        changeCategories: (state, action: PayloadAction<TCategoriesType>) => {
             state.categories = action.payload
         },
+        addTodo: (state, action: PayloadAction<TTodoType>) => {
+            state.todos = [{...action.payload}, ...state.todos]
+        },
+        editTodo: (state, action: PayloadAction<TEditTodoType>) => {
+            state.todos = state.todos.map(todo => todo.id === action.payload.id ? {...todo, title: action.payload.title} : todo)
+        },
         changeStatus: (state, action: PayloadAction<number>) => {
-            state.data = state.data.map(todo => todo.id === action.payload ? {...todo, completed: !todo.completed} : todo)
+            state.todos = state.todos.map(todo => todo.id === action.payload ? {...todo, completed: !todo.completed} : todo)
         },
         deleteElem: (state, action) => {
-            state.data = state.data.filter(todo => todo.id !== action.payload)
+            state.todos = state.todos.filter(todo => todo.id !== action.payload)
         },
-        addTodo: (state, action: PayloadAction<TTodoType>) => {
-            state.data = [{...action.payload}, ...state.data]
-        }
     }
 })
 
-export const { clearErrorMessage, changeCategiries, changeStatus, deleteElem, addTodo } = asyncTodoSlice.actions
+export const { editMessage, changeCategories, changeStatus, deleteElem, addTodo, editTodo } = asyncTodoSlice.actions
 
 export const asyncTodoReducer = asyncTodoSlice.reducer

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect} from 'react';
 import styled from 'styled-components';
-import TodoList from './components/TodoList/TodoList';
-import { useAppDispatch, useAppSelector } from './store/hooks';
+
+
+import TestForm from './components/TestForm/TestForm';
 import AddTodo from './components/AddTodo/AddTodo';
 import Categories from './components/Categories/Categories';
-import TestForm from './components/TestForm/TestForm';
+import TodoList from './components/TodoList/TodoList';
 
 
 const AppContainer = styled.div`
@@ -19,35 +20,9 @@ const Title = styled.h1`
   text-shadow: 1px 1px 3px coral;
 `
 
-const DisplayMessage = styled.div`
-  position: absolute;
-  right: 10px;
-  bottom: 20px;
-  padding: 10px 15px;
-  width: auto;
-  height: 30px;
-  border-radius: 5px;
-  border: 1px solid #00009995;
-  background-color: #00009958;
-`
+
 
 const App: React.FC = () => {
-
-    // const { error } = useAppSelector(state => state.asyncTodos)
-    // const dispatch = useAppDispatch()
-
-    // const [categories, setCategories] = useState<TCategoriesType>('all')
-
-
-    
-
-
-
-    // useEffect(() => {
-    //   if(error) {
-    //     setTimeout(() => dispatch(clearErrorMessage()), 2000)
-    //   }
-    // }, [error])
 
     console.log('render App')
 
@@ -59,15 +34,9 @@ const App: React.FC = () => {
       </Title>
       <AddTodo />
       <Categories 
-        // setCategories={setCategories} 
       />
       <TodoList 
-        // categories={categories} 
       />
-      {/* {error &&  <DisplayMessage> */}
-        {/* { error } */}
-      {/* </DisplayMessage> */}
-      {/* // } */}
     </AppContainer>
   );
 }

@@ -1,25 +1,24 @@
-import { Radio, RadioChangeEvent } from 'antd'
 import React from 'react'
+import { Radio, RadioChangeEvent } from 'antd'
 import styled from 'styled-components'
+
 import { useAppDispatch } from '../../store/hooks'
-import { TCategoriesType } from '../../store/slices/todoSlice'
+
+import { changeCategories } from '../../store/slices/todoSlice'
 
 const WrapperRadioButton = styled.div`
   padding: 15px 0;
   background-color: #fff;
 `
-type CategoriesProps = {
-  setCategories: (arg: TCategoriesType) => void
-}
+
 
 const Categories:React.FC = () => {
 
-  // const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
 
 
   const changeHandler = (e: RadioChangeEvent) => {
-    // setCategories(e.target.value)
-    // dispatch(changeCategiries(e.target.value))
+    dispatch(changeCategories(e.target.value))
   }
 
   return (
