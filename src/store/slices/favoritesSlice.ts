@@ -5,7 +5,8 @@ type TFavoritesTodo = {
     favorite: boolean,
     title: string,
     id: number,
-    userId: string
+    userId: number,
+    completed: boolean
 }
 
 type TInitialState = {
