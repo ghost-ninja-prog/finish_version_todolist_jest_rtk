@@ -1,13 +1,12 @@
-import React, { memo, useEffect } from 'react'
+import React, { memo } from 'react'
 import styled from 'styled-components'
 
-import { generationId } from '../../features/generationId'
 
 import TodoItem from '../TodoItem/TodoItem'
 import Skeleton from '../Skeleton/Skeleton'
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { fetchTodos, TCategoriesType, TTodoType } from '../../store/slices/todoSlice'
+import { TCategoriesType} from '../../store/slices/todoSlice'
 
 
 const TodosContainer = styled.div`
@@ -46,19 +45,10 @@ const TodoSkeletonContainer = styled.div`
 `
 
 
-type TodoListProps = {
-  categories: TCategoriesType
-}
-
-
 const TodoList: React.FC = memo( function TodoList() {
 
-  // useEffect(() => {
-  //     dispatch(fetchTodos())
-  //   }, [])
 
-  const { todos, loading } = useAppSelector(state => state.asyncTodos)
-  const dispatch = useAppDispatch()
+  const { data } = useAppSelector(state => state.asyncTodos)
 
   
   console.log('render TodoList')
@@ -68,30 +58,13 @@ const TodoList: React.FC = memo( function TodoList() {
         Todo List
       </TodosTitle>
       <TodosListContainer>
-        {loading ? (
-          <>
-            <p>Loading...</p>
-            <TodoSkeletonContainer>
-              <Skeleton />
-            </TodoSkeletonContainer>
-            <TodoSkeletonContainer>
-              <Skeleton />
-            </TodoSkeletonContainer>
-            <TodoSkeletonContainer>
-              <Skeleton />
-            </TodoSkeletonContainer>
-          </>
-
-          ) : (todos.length > 0) ? (
-            
-            todos.map(todo => (
-              <TodoItem key={todo.title} title={todo.title} completed={todo.completed} id={todo.id} userId={todo.userId} />
-            ))
-
-          ) : (
-            <p>Todos netu!!</p>
-          )
+        {
+          data.map(todo => (
+            <TodoItem key={todo.id} title={todo.title} completed={todo.completed} id={todo.id} userId={todo.userId} />
+          ))
         }
+
+         
       </TodosListContainer>
     </TodosContainer>
   )

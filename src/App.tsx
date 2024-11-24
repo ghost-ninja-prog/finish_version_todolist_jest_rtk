@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TodoList from './components/TodoList/TodoList';
 import { useAppDispatch, useAppSelector } from './store/hooks';
-import { clearErrorMessage, fetchTodos, TCategoriesType } from './store/slices/todoSlice';
 import AddTodo from './components/AddTodo/AddTodo';
 import Categories from './components/Categories/Categories';
 import TestForm from './components/TestForm/TestForm';
@@ -35,7 +34,7 @@ const DisplayMessage = styled.div`
 const App: React.FC = () => {
 
     // const { error } = useAppSelector(state => state.asyncTodos)
-    const dispatch = useAppDispatch()
+    // const dispatch = useAppDispatch()
 
     // const [categories, setCategories] = useState<TCategoriesType>('all')
 

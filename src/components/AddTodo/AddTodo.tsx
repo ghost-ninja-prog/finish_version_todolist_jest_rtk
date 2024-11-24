@@ -7,7 +7,8 @@ import styled from 'styled-components'
 
 import { useAppDispatch } from '../../store/hooks'
 
-import { createTodo } from '../../store/slices/todoSlice'
+import { addTodo } from '../../store/slices/todoSlice'
+import { generationId } from '../../features/generationId'
 
 
 const InputWrapper = styled.div`
@@ -46,11 +47,12 @@ const AddTodo = () => {
 
         const newTodo = {
             title: inputValue.trim(),
-            userId: '1',
-            completed: false
+            userId: 1,
+            completed: false,
+            id: generationId()
         }
 
-        dispatch(createTodo(newTodo))
+        dispatch(addTodo(newTodo))
         setInputValue('')
     }
 

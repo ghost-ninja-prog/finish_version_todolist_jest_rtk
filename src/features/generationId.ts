@@ -1,5 +1,5 @@
-type GenerationId = () => string
+type GenerationId = () => number
 
 export const generationId: GenerationId = () => (
-    Math.random().toString().slice(2, 10) + new Date().getTime().toString()
+   new Date().getTime()
 )
