@@ -140,25 +140,25 @@ const asyncTodoSlice = createSlice({
             })
             .addCase(fetchTodos.rejected, (state, action) => {
                 state.loading = false
-                state.error = action.error.message
+                state.message = action.error.message
             })
             .addCase(toggleAsyncTodo.fulfilled, (state, action) => {
                 state.todos = state.todos.map(todo => todo.id === action.payload.id ? action.payload : todo)                
             })
             .addCase(toggleAsyncTodo.rejected, (state, action) => {
-                state.error = action.error.message
+                state.message = action.error.message
             })
             .addCase(deleteAsyncTodo.fulfilled, (state, action) => {
                 state.todos = state.todos.filter(todo => todo.id !== action.payload)                
             })
             .addCase(deleteAsyncTodo.rejected, (state, action) => {
-                state.error = action.error.message
+                state.message = action.error.message
             })
             .addCase(editAsyncTodo.fulfilled, (state, action) => {
                 state.todos = state.todos.map(todo => todo.id === action.payload.id ? action.payload : todo)                
             })
             .addCase(editAsyncTodo.rejected, (state, action) => {
-                state.error = action.error.message
+                state.message = action.error.message
             })
             .addCase(createAsyncTodo.fulfilled, (state, action) => {
                 state.todos = [{...action.payload}, ...state.todos]

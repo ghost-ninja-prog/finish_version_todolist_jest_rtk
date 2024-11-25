@@ -71,13 +71,13 @@ const TodoList: React.FC = memo( function TodoList() {
 
   useEffect(() => {
     dispatch(fetchTodos())
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     if(message) {
       setTimeout(() => dispatch(editMessage(null)), 2000)
     }
-  }, [message])
+  }, [message, dispatch])
 
 
 
@@ -94,7 +94,7 @@ const TodoList: React.FC = memo( function TodoList() {
       {categories !== 'favorite' ? (
 
       <TodosListContainer>
-        {loading && <Skeleton />}
+        {loading && <TodoSkeletonContainer> <Skeleton /> </TodoSkeletonContainer>}
         {
           todos.filter(todo => {
             if(categories === 'all') {

@@ -1,11 +1,11 @@
 import React, { memo, useState } from 'react'
 import styled from 'styled-components'
-import { CheckOutlined, DeleteOutlined, EditOutlined, StarFilled, StarOutlined, StarTwoTone } from '@ant-design/icons'
+import { CheckOutlined, DeleteOutlined, EditOutlined, StarFilled, StarOutlined } from '@ant-design/icons'
 import { Button, Checkbox, Flex, Tooltip } from 'antd'
 
 
 import { useAppDispatch } from '../../store/hooks'
-import { TEditTodoType, TTodoType, deleteAsyncTodo, editAsyncTodo, editMessage, toggleAsyncTodo } from '../../store/slices/todoSlice'
+import { TTodoType, deleteAsyncTodo, editAsyncTodo, editMessage, toggleAsyncTodo } from '../../store/slices/todoSlice'
 import { addToFavorites, deleteFromFavorites, editInFavorites, changeStatusInFavorites } from '../../store/slices/favoritesSlice'
 
 
