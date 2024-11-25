@@ -6,6 +6,7 @@ export type TTodoType = {
     id: number,
     completed: boolean,
     userId: number,
+    favotite?: boolean,
 }
 
 export type TCategoriesType = 'all' | 'completed' | 'active' | 'favorite'

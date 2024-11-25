@@ -25,7 +25,7 @@ const TodosListContainer = styled.div`
   border: 1px solid rgba(0, 0, 0, .3);
   border-radius: 5px;
   overflow-y: scroll;
-  height: 350px;
+  height: 300px;
   padding: 5px 8px;
   scrollbar-width: thin;
   scrollbar-color: #dad8d8 #fff;
@@ -65,6 +65,7 @@ const DisplayMessage = styled.span`
 const TodoList: React.FC = memo( function TodoList() {
 
   const { message, todos, categories } = useAppSelector(state => state.asyncTodos)
+  const { todosFavorite } = useAppSelector(state => state.favorites)
     const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -85,6 +86,8 @@ const TodoList: React.FC = memo( function TodoList() {
       <TodosTitle>
         Todo List
       </TodosTitle>
+      {categories !== 'favorite' ? (
+
       <TodosListContainer>
         {
           todos.filter(todo => {
@@ -98,13 +101,24 @@ const TodoList: React.FC = memo( function TodoList() {
               return todo.completed === false
             }
             return todo
-          }).map(todo => (
-            <TodoItem key={todo.id} title={todo.title} completed={todo.completed} id={todo.id} userId={todo.userId} />
-          ))
+          }).map(todo => {
+            const idx = todosFavorite.findIndex(t => t.id === todo.id)
+            return (idx === -1) ? (<TodoItem key={todo.id} todo={todo} favorite={false} />) : ( <TodoItem key={todo.id} todo={todo} favorite={true} /> )
+            
+          })
         }
-
-         
       </TodosListContainer>
+      ) : (
+        <TodosListContainer>
+          {
+            todosFavorite.map(todo => (
+              <TodoItem key={todo.id} todo={todo} favorite={true} />
+            ))
+          }
+        </TodosListContainer>
+      )}         
+      
+    
     </TodosContainer>
   )
 })

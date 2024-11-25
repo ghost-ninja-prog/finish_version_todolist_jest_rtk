@@ -1,12 +1,12 @@
-import React, { memo, useState } from 'react'
+import React, { memo, ReactHTMLElement, useState } from 'react'
 import styled from 'styled-components'
-import { CheckOutlined, DeleteOutlined, EditOutlined, StarOutlined } from '@ant-design/icons'
+import { CheckOutlined, DeleteOutlined, EditOutlined, StarFilled, StarOutlined, StarTwoTone } from '@ant-design/icons'
 import { Button, Checkbox, Flex, Tooltip } from 'antd'
 
 
 import { useAppDispatch } from '../../store/hooks'
 import { TEditTodoType, TTodoType, changeStatus, deleteElem, editMessage, editTodo } from '../../store/slices/todoSlice'
-import { addToFavorites } from '../../store/slices/favoritesSlice'
+import { addToFavorites, deleteFromFavorites, editInFavorites, changeStatusInFavorites } from '../../store/slices/favoritesSlice'
 
 
 
@@ -40,19 +40,28 @@ const TodoInputTitle = styled.input`
   margin: 0 15px;
 `
 
+type TodoItemProps = {
+  todo: TTodoType,
+  favorite: boolean
+}
 
 
 
-const TodoItem: React.FC<TTodoType> = memo( function TodoItem ({ title, id, completed, userId }) {
+const TodoItem: React.FC<TodoItemProps> = memo( function TodoItem ({ todo, favorite }) {
 
-  const [titleValue, setTitleValue] = useState(title)
+  const [titleValue, setTitleValue] = useState(todo.title)
   const [isEditMode, setIsEditMode] = useState(false)
 
   const dispatch = useAppDispatch()
 
 
-  const checkboxHandler = () => {    
-    dispatch(changeStatus(id))
+  const checkboxHandler = () => {
+    if(favorite) {
+      dispatch(changeStatus(todo.id))
+      dispatch(changeStatusInFavorites(todo.id))
+    } else {
+      dispatch(changeStatus(todo.id))
+    }
   }
 
 
@@ -63,7 +72,7 @@ const TodoItem: React.FC<TTodoType> = memo( function TodoItem ({ title, id, comp
 
   const clickEditHandler = () => {
     setIsEditMode(true)
-    setTitleValue(title)
+    setTitleValue(todo.title)
   }
 
 
@@ -74,26 +83,36 @@ const TodoItem: React.FC<TTodoType> = memo( function TodoItem ({ title, id, comp
       return
     }
     const updatedTodo: TEditTodoType = {
-      id: id,
+      id: todo.id,
       title: titleValue.trim(),
     }
-    dispatch(editTodo(updatedTodo))
-    setTitleValue(title)
+    if(favorite) {
+      dispatch(editInFavorites(updatedTodo))
+      dispatch(editTodo(updatedTodo))
+    } else {
+      dispatch(editTodo(updatedTodo))
+    }
+    setTitleValue(todo.title)
+  }
+
+  const onPressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.key === 'Enter') {
+      clickSaveHandler()
+    }
   }
 
 
   const clickDeleteHandler = () => {
-    dispatch(deleteElem(id))
+    if (favorite) {
+      dispatch(deleteFromFavorites(todo.id))
+      dispatch(deleteElem(todo.id))
+    } else {
+      dispatch(deleteElem(todo.id))
+    }
   }
 
   const clickFavoritesHandler = () => {
-    dispatch(addToFavorites({
-      id,
-      userId,
-      title,
-      completed,
-      favorite: true
-    }))
+    favorite ? dispatch(deleteFromFavorites(todo.id)) : dispatch(addToFavorites(todo))
   }
 
 
@@ -103,15 +122,29 @@ const TodoItem: React.FC<TTodoType> = memo( function TodoItem ({ title, id, comp
 
       <Flex gap="small">
         <Checkbox
-          checked={completed}
+          checked={todo.completed}
           onChange={checkboxHandler}
           />
+
         <Tooltip title="favorites">
-          <Button         
-            icon={ <StarOutlined /> }
-            onClick={clickFavoritesHandler}
-            />
+          {favorite ? (
+
+            <Button         
+              icon={ <StarFilled /> }
+              onClick={clickFavoritesHandler}
+              />
+          
+          ) : (
+        
+            <Button         
+              icon={ <StarOutlined /> }
+              onClick={clickFavoritesHandler}
+              />
+        
+            )
+          }
         </Tooltip>
+
       </Flex>
 
       {isEditMode ? (
@@ -119,10 +152,11 @@ const TodoItem: React.FC<TTodoType> = memo( function TodoItem ({ title, id, comp
           value={titleValue}
           type='text'
           onChange={inputHandler}
+          onKeyDown={onPressEnter}
         />
       ) : (
         <TodoTitle>
-          {title}
+          {todo.title}
         </TodoTitle>
       )}  
 
