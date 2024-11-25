@@ -6,7 +6,7 @@ import TodoItem from '../TodoItem/TodoItem'
 import Skeleton from '../Skeleton/Skeleton'
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { editMessage } from '../../store/slices/todoSlice'
+import { editMessage, fetchTodos } from '../../store/slices/todoSlice'
 
 
 const TodosContainer = styled.div`
@@ -18,6 +18,7 @@ const TodosContainer = styled.div`
 
 const TodosTitle = styled.h2`
   font-size: 28px;
+  font-weight: 600;
   margin: 10px 0;
 `
 
@@ -64,9 +65,13 @@ const DisplayMessage = styled.span`
 
 const TodoList: React.FC = memo( function TodoList() {
 
-  const { message, todos, categories } = useAppSelector(state => state.asyncTodos)
+  const { message, todos, categories, loading } = useAppSelector(state => state.asyncTodos)
   const { todosFavorite } = useAppSelector(state => state.favorites)
-    const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    dispatch(fetchTodos())
+  }, [])
 
   useEffect(() => {
     if(message) {
@@ -89,6 +94,7 @@ const TodoList: React.FC = memo( function TodoList() {
       {categories !== 'favorite' ? (
 
       <TodosListContainer>
+        {loading && <Skeleton />}
         {
           todos.filter(todo => {
             if(categories === 'all') {

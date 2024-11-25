@@ -1,11 +1,11 @@
-import React, { memo, ReactHTMLElement, useState } from 'react'
+import React, { memo, useState } from 'react'
 import styled from 'styled-components'
 import { CheckOutlined, DeleteOutlined, EditOutlined, StarFilled, StarOutlined, StarTwoTone } from '@ant-design/icons'
 import { Button, Checkbox, Flex, Tooltip } from 'antd'
 
 
 import { useAppDispatch } from '../../store/hooks'
-import { TEditTodoType, TTodoType, changeStatus, deleteElem, editMessage, editTodo } from '../../store/slices/todoSlice'
+import { TEditTodoType, TTodoType, deleteAsyncTodo, editAsyncTodo, editMessage, toggleAsyncTodo } from '../../store/slices/todoSlice'
 import { addToFavorites, deleteFromFavorites, editInFavorites, changeStatusInFavorites } from '../../store/slices/favoritesSlice'
 
 
@@ -54,21 +54,23 @@ const TodoItem: React.FC<TodoItemProps> = memo( function TodoItem ({ todo, favor
 
   const dispatch = useAppDispatch()
 
-
-  const checkboxHandler = () => {
-    if(favorite) {
-      dispatch(changeStatus(todo.id))
-      dispatch(changeStatusInFavorites(todo.id))
-    } else {
-      dispatch(changeStatus(todo.id))
-    }
-  }
-
-
   const inputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitleValue(e.target.value)
   }
 
+
+  const checkboxHandler = () => {
+    if(favorite) {
+      dispatch(changeStatusInFavorites(todo.id))
+      dispatch(toggleAsyncTodo(todo))
+    } else {
+      dispatch(toggleAsyncTodo(todo))
+    }
+  }
+
+  const clickFavoritesHandler = () => {
+    favorite ? dispatch(deleteFromFavorites(todo.id)) : dispatch(addToFavorites(todo))
+  }
 
   const clickEditHandler = () => {
     setIsEditMode(true)
@@ -82,15 +84,17 @@ const TodoItem: React.FC<TodoItemProps> = memo( function TodoItem ({ todo, favor
       dispatch(editMessage('Введите текст задачи'))
       return
     }
-    const updatedTodo: TEditTodoType = {
+    const updatedTodo: TTodoType = {
       id: todo.id,
       title: titleValue.trim(),
+      completed: todo.completed,
+      userId: todo.userId
     }
     if(favorite) {
       dispatch(editInFavorites(updatedTodo))
-      dispatch(editTodo(updatedTodo))
+      dispatch(editAsyncTodo(updatedTodo))
     } else {
-      dispatch(editTodo(updatedTodo))
+      dispatch(editAsyncTodo(updatedTodo))
     }
     setTitleValue(todo.title)
   }
@@ -105,15 +109,12 @@ const TodoItem: React.FC<TodoItemProps> = memo( function TodoItem ({ todo, favor
   const clickDeleteHandler = () => {
     if (favorite) {
       dispatch(deleteFromFavorites(todo.id))
-      dispatch(deleteElem(todo.id))
+      dispatch(deleteAsyncTodo(todo.id))
     } else {
-      dispatch(deleteElem(todo.id))
+      dispatch(deleteAsyncTodo(todo.id))
     }
   }
 
-  const clickFavoritesHandler = () => {
-    favorite ? dispatch(deleteFromFavorites(todo.id)) : dispatch(addToFavorites(todo))
-  }
 
 
   console.log('render TodoItem')

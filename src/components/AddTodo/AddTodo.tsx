@@ -7,7 +7,7 @@ import styled from 'styled-components'
 
 import { useAppDispatch } from '../../store/hooks'
 
-import { addTodo } from '../../store/slices/todoSlice'
+import { createAsyncTodo } from '../../store/slices/todoSlice'
 import { generationId } from '../../features/generationId'
 
 
@@ -39,7 +39,7 @@ const AddTodo = () => {
     }
 
 
-    const createNewTodo = () => {
+    const clickButtonHandler = () => {
         if(!inputValue.trim()) {
             setInputValue('')
             return
@@ -49,16 +49,10 @@ const AddTodo = () => {
             title: inputValue.trim(),
             userId: 1,
             completed: false,
-            id: generationId()
         }
 
-        dispatch(addTodo(newTodo))
+        dispatch(createAsyncTodo(newTodo))
         setInputValue('')
-    }
-
-
-    const clickButtonHandler = () => {
-        createNewTodo()
     }
 
 
@@ -72,7 +66,7 @@ const AddTodo = () => {
                 <Input
                     value={inputValue}
                     onChange={inputChangeHandler}
-                    onPressEnter={createNewTodo}
+                    onPressEnter={clickButtonHandler}
                     />
                 <Button
                     icon={<SaveOutlined />}
