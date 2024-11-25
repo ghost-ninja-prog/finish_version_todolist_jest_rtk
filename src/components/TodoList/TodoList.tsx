@@ -64,7 +64,7 @@ const DisplayMessage = styled.span`
 
 const TodoList: React.FC = memo( function TodoList() {
 
-  const { message, todos } = useAppSelector(state => state.asyncTodos)
+  const { message, todos, categories } = useAppSelector(state => state.asyncTodos)
     const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -87,7 +87,18 @@ const TodoList: React.FC = memo( function TodoList() {
       </TodosTitle>
       <TodosListContainer>
         {
-          todos.map(todo => (
+          todos.filter(todo => {
+            if(categories === 'all') {
+              return todo
+            } 
+            if (categories === 'completed') {
+              return todo.completed === true
+            }
+            if(categories === 'active') {
+              return todo.completed === false
+            }
+            return todo
+          }).map(todo => (
             <TodoItem key={todo.id} title={todo.title} completed={todo.completed} id={todo.id} userId={todo.userId} />
           ))
         }
