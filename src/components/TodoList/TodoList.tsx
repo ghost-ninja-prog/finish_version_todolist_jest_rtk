@@ -59,13 +59,13 @@ const DisplayMessage = styled.span`
 
 const TodoList: React.FC = () => {
 
-  const { message, todos, categories, loading, startElem } = useAppSelector(state => state.asyncTodos)
+  const { message, todos, categories } = useAppSelector(state => state.asyncTodos)
   const { todosFavorite } = useAppSelector(state => state.favorites)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
     dispatch(fetchTodos(0))
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     if(message) {
