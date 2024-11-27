@@ -15,6 +15,7 @@ export type TCategoriesType = 'all' | 'completed' | 'active' | 'favorite'
 export type TTodosStateType = {
     todos: TTodoType[],
     loading: boolean,
+    startElem: number,
     error: string | null | undefined,
     message: string | null | undefined,
     categories: TCategoriesType
@@ -36,8 +37,8 @@ export const URL = 'https://jsonplaceholder.typicode.com/todos'
 
 export const fetchTodos = createAsyncThunk(
     'todos/fetchTodos',
-    async (_, { rejectWithValue }) => {
-        const response = await axios.get(`${URL}?_limit=20`) 
+    async (page: number = 0, { rejectWithValue }) => {
+        const response = await axios.get(`${URL}?_limit=15&_start=${page}`) 
         if (response.status !== 200) {
             return rejectWithValue('Can\'t fetch todo. Server error!!!')
         }
@@ -101,6 +102,7 @@ export const editAsyncTodo = createAsyncThunk(
 const initialState: TTodosStateType = {
     todos: [],
     loading: false,
+    startElem: 0,
     error: null,
     message: null,
     categories: 'all',
@@ -128,6 +130,9 @@ const asyncTodoSlice = createSlice({
         deleteElem: (state, action) => {
             state.todos = state.todos.filter(todo => todo.id !== action.payload)
         },
+        changeStartElem: (state) => {
+            state.startElem = state.startElem + 5
+        }
     },
     extraReducers(builder) {
         builder
@@ -135,7 +140,8 @@ const asyncTodoSlice = createSlice({
                 state.loading = true
             })
             .addCase(fetchTodos.fulfilled, (state, action) => {
-                state.todos = action.payload
+                state.todos = state.todos.concat(action.payload)
+                state.startElem = state.startElem + 5
                 state.loading = false
             })
             .addCase(fetchTodos.rejected, (state, action) => {
@@ -169,6 +175,6 @@ const asyncTodoSlice = createSlice({
     },
 })
 
-export const { editMessage, changeCategories, changeStatus, deleteElem, addTodo, editTodo } = asyncTodoSlice.actions
+export const { editMessage, changeCategories, changeStatus, deleteElem, addTodo, editTodo, changeStartElem } = asyncTodoSlice.actions
 
 export const asyncTodoReducer = asyncTodoSlice.reducer

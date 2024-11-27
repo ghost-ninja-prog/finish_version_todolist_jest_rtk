@@ -1,5 +1,6 @@
-import React, { memo, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 
 import TodoItem from '../TodoItem/TodoItem'
@@ -23,10 +24,12 @@ const TodosTitle = styled.h2`
 `
 
 const TodosListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   border: 1px solid rgba(0, 0, 0, .3);
   border-radius: 5px;
-  overflow-y: scroll;
-  height: 300px;
+  overflow: auto;
+  height: 250px;
   padding: 5px 8px;
   scrollbar-width: thin;
   scrollbar-color: #dad8d8 #fff;
@@ -36,15 +39,6 @@ const TodosListContainer = styled.div`
   }
 `
 
-const TodoSkeletonContainer = styled.div`
-  border: 1px solid rgba(0,0,0, .3);
-  border-radius: 5px;
-  padding: 7px 15px;
-  margin: 3px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`
 
 const DisplayMessage = styled.span`
   position: absolute;
@@ -63,22 +57,21 @@ const DisplayMessage = styled.span`
 `
 
 
-const TodoList: React.FC = memo( function TodoList() {
+const TodoList: React.FC = () => {
 
-  const { message, todos, categories, loading } = useAppSelector(state => state.asyncTodos)
+  const { message, todos, categories, loading, startElem } = useAppSelector(state => state.asyncTodos)
   const { todosFavorite } = useAppSelector(state => state.favorites)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(fetchTodos())
-  }, [dispatch])
+    dispatch(fetchTodos(0))
+  }, [])
 
   useEffect(() => {
     if(message) {
       setTimeout(() => dispatch(editMessage(null)), 2000)
     }
   }, [message, dispatch])
-
 
 
   
@@ -93,40 +86,50 @@ const TodoList: React.FC = memo( function TodoList() {
       </TodosTitle>
       {categories !== 'favorite' ? (
 
-      <TodosListContainer>
-        {loading && <TodoSkeletonContainer> <Skeleton /> </TodoSkeletonContainer>}
-        {
-          todos.filter(todo => {
-            if(categories === 'all') {
-              return todo
-            } 
-            if (categories === 'completed') {
-              return todo.completed === true
-            }
-            if(categories === 'active') {
-              return todo.completed === false
-            }
-            return todo
-          }).map(todo => {
-            const idx = todosFavorite.findIndex(t => t.id === todo.id)
-            return (idx === -1) ? (<TodoItem key={todo.id} todo={todo} favorite={false} />) : ( <TodoItem key={todo.id} todo={todo} favorite={true} /> )
-            
-          })
-        }
-      </TodosListContainer>
-      ) : (
-        <TodosListContainer>
+      <TodosListContainer
+        id='scrollableDiv'
+      >
+        <InfiniteScroll
+          dataLength={todos.length}
+          next={() => {dispatch(fetchTodos(todos.length))}}
+          hasMore={todos.length < 200}
+          loader={<Skeleton />}
+          scrollableTarget='scrollableDiv'
+        >
           {
-            todosFavorite.map(todo => (
-              <TodoItem key={todo.id} todo={todo} favorite={true} />
-            ))
+            todos.filter(todo => {
+              if(categories === 'all') {
+                return todo
+              } 
+              if (categories === 'completed') {
+                return todo.completed === true
+              }
+              if(categories === 'active') {
+                return todo.completed === false
+              }
+              return todo
+            }).map(todo => {
+              const idx = todosFavorite.findIndex(t => t.id === todo.id)
+              return (idx === -1) ? (<TodoItem key={todo.id} todo={todo} favorite={false} />) : ( <TodoItem key={todo.id} todo={todo} favorite={true} /> )
+              
+            })
           }
-        </TodosListContainer>
+        </InfiniteScroll>
+      </TodosListContainer>
+
+      ) : (
+          <TodosListContainer>
+            {
+              todosFavorite.map(todo => (
+                <TodoItem key={todo.id} todo={todo} favorite={true} />
+              ))
+            }
+          </TodosListContainer>
       )}         
       
     
     </TodosContainer>
   )
-})
+}
 
 export default TodoList
