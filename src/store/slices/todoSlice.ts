@@ -1,5 +1,4 @@
-import {  createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
+import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 
 
 export type TTodoType = {
@@ -7,7 +6,7 @@ export type TTodoType = {
     id: number,
     completed: boolean,
     userId: number,
-    favotite?: boolean,
+    favorite?: boolean,
 }
 
 export type TCategoriesType = 'all' | 'completed' | 'active' | 'favorite'
@@ -35,66 +34,117 @@ export type TCreatedTodo = {
 export const URL = 'https://jsonplaceholder.typicode.com/todos'
 
 
-export const fetchTodos = createAsyncThunk(
+export const fetchTodos = createAsyncThunk<TTodoType[], number, {rejectValue: string}>(
     'todos/fetchTodos',
-    async (page: number = 0, { rejectWithValue }) => {
-        const response = await axios.get(`${URL}?_limit=15&_start=${page}`) 
-        if (response.status !== 200) {
-            return rejectWithValue('Can\'t fetch todo. Server error!!!')
+    async (page = 0, { rejectWithValue }) => {
+        try{
+            const res = await fetch(`${URL}?_limit=15&_start=${page}`)
+            if(!res.ok) {
+                throw new Error('Error load data!!!!')
+            }
+            return await res.json()
+        } catch (e) {
+            if (e instanceof Error) {
+                return rejectWithValue(e.message)
+            }
         }
-        return response.data
     }
 )
 
-export const createAsyncTodo = createAsyncThunk(
-    'todos/createTodo',
+export const createAsyncTodo = createAsyncThunk<TTodoType, TCreatedTodo, { rejectValue: string }>(
+    'todos/createAsyncTodo',
     async (todo: TCreatedTodo, { rejectWithValue }) => {
-        const response = await axios.post(`${URL}`, todo)
-        if(response.status !== 201) {
-            return rejectWithValue('Error created todo')
+        try{
+            const res = await fetch(URL, {
+                method: 'POST',
+                body: JSON.stringify(todo),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8'
+                }
+            })
+            if(!res.ok) {
+                throw new Error('Error creation todos')
+            }
+            return await res.json()
+        } catch (e) {
+            if(e instanceof Error) {
+                return rejectWithValue(e.message)
+            }
         }
-        console.log(response.data)
-        return response.data
     }
 )
 
-export const toggleAsyncTodo = createAsyncThunk(
+export const toggleAsyncTodo = createAsyncThunk<TTodoType, TTodoType, {rejectValue: string}>(
     'todos/toggleTodo',
-    async (todo: TTodoType, { rejectWithValue }) =>{
-        const response = await axios.patch(`${URL}/${todo.id}`, 
-            {completed: !todo.completed})
-        if(response.status !== 200) {
-            return rejectWithValue('error server !!!!!')
+    async (todo, { rejectWithValue }) => {
+        try {
+            const res = await fetch(
+                `${URL}/${todo.id}`,
+                {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        completed: !todo.completed
+                    }),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8'
+                    }
+                }
+            )
+            if(!res.ok) {
+                throw new Error('Error toggle todo')
+            }
+            return await res.json()
+        } catch (e) {
+            if(e instanceof Error) {
+                return rejectWithValue(e.message)
+            }
         }
-        return response.data
     }
 )
 
-export const deleteAsyncTodo = createAsyncThunk(
+export const deleteAsyncTodo = createAsyncThunk<number, number,{rejectValue: string}>(
     'todos/deleteTodo',
-    async (id: number, { rejectWithValue }) => {
-        const response = await axios.delete(`${URL}/${id}`)
-
-        if (response.status !== 200) {
-            return rejectWithValue('Can\'t dalete todo. Server error!!!')
+    async (id, { rejectWithValue }) => {
+        try{
+            const response = await fetch(`${URL}/${id}`, {
+                method: 'DELETE'
+            })
+            if(!response.ok) {
+                throw new Error('error delete todo')
+            }
+            response.json = () => Promise.resolve(id)
+            return response.json()
+        } catch (e) {
+            if(e instanceof Error) {
+                return rejectWithValue(e.message)
+            }
         }
-        return id
     }
 )
 
-export const editAsyncTodo = createAsyncThunk(
+export const editAsyncTodo = createAsyncThunk<TTodoType, TTodoType, { rejectValue: string }>(
     'todos/editTodo',
     async (todo: TTodoType, { rejectWithValue }) => {
-        const response = await axios.put(`${URL}/${todo.id}`, {
-            id: todo.id,
-            title: todo.title,
-            userId: todo.userId,
-            completed: todo.completed
-        })
-        if(response.status !== 200) {
-            return rejectWithValue('error server !!!!!')
+        try {
+            const res = await fetch(
+                `${URL}/${todo.id}`,
+                {
+                    method: 'PUT',
+                    body: JSON.stringify(todo),
+                    headers: {
+                        'Content-type': 'application/json; charset=UTF-8'
+                    }
+                }
+            )
+            if(!res.ok) {
+                throw new Error('Error edit todo')
+            }
+            return await res.json()
+        } catch (e) {
+            if(e instanceof Error) {
+                return rejectWithValue(e.message)
+            }
         }
-        return response.data
     } 
 )
 
@@ -146,31 +196,32 @@ const asyncTodoSlice = createSlice({
             })
             .addCase(fetchTodos.rejected, (state, action) => {
                 state.loading = false
-                state.message = action.error.message
+                state.todos = [{id: 1, title: 'error', completed: false, userId: 1}]
+                state.message = action.payload
             })
             .addCase(toggleAsyncTodo.fulfilled, (state, action) => {
                 state.todos = state.todos.map(todo => todo.id === action.payload.id ? action.payload : todo)                
             })
             .addCase(toggleAsyncTodo.rejected, (state, action) => {
-                state.message = action.error.message
+                state.message = action.payload
             })
             .addCase(deleteAsyncTodo.fulfilled, (state, action) => {
-                state.todos = state.todos.filter(todo => todo.id !== action.payload)                
+                state.todos = state.todos.filter(todo => todo.id !== action.payload)
             })
             .addCase(deleteAsyncTodo.rejected, (state, action) => {
-                state.message = action.error.message
+                state.message = action.payload
             })
             .addCase(editAsyncTodo.fulfilled, (state, action) => {
                 state.todos = state.todos.map(todo => todo.id === action.payload.id ? action.payload : todo)                
             })
             .addCase(editAsyncTodo.rejected, (state, action) => {
-                state.message = action.error.message
+                state.message = action.payload
             })
             .addCase(createAsyncTodo.fulfilled, (state, action) => {
                 state.todos = [{...action.payload}, ...state.todos]
             })
             .addCase(createAsyncTodo.rejected, (state, action) => {
-                state.message = action.error.message
+                state.message = action.payload
             })
     },
 })

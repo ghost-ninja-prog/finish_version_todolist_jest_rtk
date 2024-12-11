@@ -69,7 +69,7 @@ const TodoList: React.FC = () => {
 
   useEffect(() => {
     if(message) {
-      setTimeout(() => dispatch(editMessage(null)), 2000)
+      setTimeout(() => dispatch(editMessage(null)), 5000)
     }
   }, [message, dispatch])
 
@@ -82,7 +82,7 @@ const TodoList: React.FC = () => {
         message &&  <DisplayMessage> { message } </DisplayMessage>
       }
       <TodosTitle>
-        Todo List
+        "Todo List"
       </TodosTitle>
       {categories !== 'favorite' ? (
 

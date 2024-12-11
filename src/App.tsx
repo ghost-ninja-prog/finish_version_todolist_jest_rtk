@@ -35,10 +35,8 @@ const App: React.FC = () => {
         Todo List React+RTK+Jest
       </Title>
       <AddTodo />
-      <Categories 
-      />
-      <TodoList 
-      />
+      <Categories />
+      <TodoList />
     </AppContainer>
   );
 }
