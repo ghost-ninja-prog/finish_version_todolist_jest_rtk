@@ -64,7 +64,7 @@ describe('todoThunk fetchTodos resolved', () => {
         originalFetch = global.fetch
         global.fetch = jest.fn(() => Promise.resolve({
             ok: true,
-            json: () => Promise.resolve([ mockTodos ])
+            json: () => Promise.resolve(mockTodos)
         } as Response))
     })
 

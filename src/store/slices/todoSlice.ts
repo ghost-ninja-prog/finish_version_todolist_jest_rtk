@@ -110,7 +110,7 @@ export const deleteAsyncTodo = createAsyncThunk<number, number,{rejectValue: str
                 method: 'DELETE'
             })
             if(!response.ok) {
-                throw new Error('error delete todo')
+                throw new Error('Error delete todo')
             }
             response.json = () => Promise.resolve(id)
             return response.json()
